@@ -22,15 +22,16 @@ class CosmosLayers {
       totalNumberOfStars: settings.totalStars)
 
     var starLayers = [CALayer]()
-
-    for _ in (0..<settings.totalStars) {
-      
-      let fillLevel = CosmosRating.starFillLevel(ratingRemainder: ratingRemander,
-        fillMode: settings.fillMode)
-      
-      let starLayer = createCompositeStarLayer(fillLevel, settings: settings, isRightToLeft: isRightToLeft)
-      starLayers.append(starLayer)
-      ratingRemander -= 1
+    var starLayer = CALayer()
+    
+    for index in (0..<settings.totalStars) {
+        
+        let fillLevel = CosmosRating.starFillLevel(ratingRemainder: ratingRemander,
+                                                   fillMode: settings.fillMode)
+        
+        starLayer = createCompositeStarLayer(fillLevel, settings: settings, isRightToLeft: isRightToLeft, indexDot: index + 1)
+        starLayers.append(starLayer)
+        ratingRemander -= 1
     }
     
     if isRightToLeft { starLayers.reverse() }
@@ -50,17 +51,17 @@ class CosmosLayers {
   
   */
   class func createCompositeStarLayer(_ starFillLevel: Double,
-                                      settings: CosmosSettings, isRightToLeft: Bool) -> CALayer {
+                                      settings: CosmosSettings, isRightToLeft: Bool, indexDot: Int) -> CALayer {
 
     if starFillLevel >= 1 {
-      return createStarLayer(true, settings: settings)
+        return createStarLayer(true, settings: settings, indexDot: indexDot)
     }
 
     if starFillLevel == 0 {
-      return createStarLayer(false, settings: settings)
+        return createStarLayer(false, settings: settings, indexDot: indexDot)
     }
 
-    return createPartialStar(starFillLevel, settings: settings, isRightToLeft: isRightToLeft)
+    return createPartialStar(starFillLevel, settings: settings, isRightToLeft: isRightToLeft, indexDot: indexDot)
   }
 
   /**
@@ -76,9 +77,9 @@ class CosmosLayers {
   - returns: Layer that contains the partially filled star.
   
   */
-  class func createPartialStar(_ starFillLevel: Double, settings: CosmosSettings, isRightToLeft: Bool) -> CALayer {
-    let filledStar = createStarLayer(true, settings: settings)
-    let emptyStar = createStarLayer(false, settings: settings)
+  class func createPartialStar(_ starFillLevel: Double, settings: CosmosSettings, isRightToLeft: Bool, indexDot: Int) -> CALayer {
+    let filledStar = createStarLayer(true, settings: settings, indexDot: indexDot)
+    let emptyStar = createStarLayer(false, settings: settings, indexDot: indexDot)
 
 
     let parentLayer = CALayer()
@@ -100,23 +101,29 @@ class CosmosLayers {
     return parentLayer
   }
 
-  private class func createStarLayer(_ isFilled: Bool, settings: CosmosSettings) -> CALayer {
-    if let image = isFilled ? settings.filledImage : settings.emptyImage {
-      // Create a layer that shows a star from an image
-      return StarLayer.create(image: image, size: settings.starSize)
-    }
-    
-    // Create a layer that draws a star from an array of points
-    
-    let fillColor = isFilled ? settings.filledColor : settings.emptyColor
-    let strokeColor = isFilled ? settings.filledBorderColor : settings.emptyBorderColor
+    private class func createStarLayer(_ isFilled: Bool, settings: CosmosSettings, indexDot: Int) -> CALayer {
+        if let image = isFilled ? settings.filledImage : settings.emptyImage {
+// Create a layer that shows a star from an image
+            return StarLayer.create(image: image, size: settings.starSize)
+        }
+        
+        let fillColor = isFilled ? settings.filledColor : settings.emptyColor
+        let strokeColor = isFilled ? settings.filledBorderColor : settings.emptyBorderColor
+        let borderWidth = isFilled ? settings.filledBorderWidth : settings.emptyBorderWidth
+        let numberColor = isFilled ? settings.filledNumberColor : settings.emptyNumberColor
 
-    return StarLayer.create(settings.starPoints,
-      size: settings.starSize,
-      lineWidth: isFilled ? settings.filledBorderWidth : settings.emptyBorderWidth,
-      fillColor: fillColor,
-      strokeColor: strokeColor)
-  }
+// Create a layer that draws a circle with number in center
+        if settings.isEnumeratedView {
+            return StarLayer.createNumeric(size: settings.starSize, font: settings.fontOfNumber, lineWidth: borderWidth, fillColor: fillColor, strokeColor: strokeColor, numberColor: numberColor, text: "\(indexDot)")
+        }
+        
+// Create a layer that draws a star from an array of points
+        return StarLayer.create(settings.starPoints,
+                                size: settings.starSize,
+                                lineWidth: borderWidth,
+                                fillColor: fillColor,
+                                strokeColor: strokeColor)
+    }
 
   /**
   
