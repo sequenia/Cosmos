@@ -23,20 +23,31 @@ struct StarLayer {
   - returns: New layer containing the star shape.
   
   */
-  static func create(_ starPoints: [CGPoint], size: Double,
-    lineWidth: Double, fillColor: UIColor, strokeColor: UIColor) -> CALayer {
-      
-    let containerLayer = createContainerLayer(size)
-    let path = createStarPath(starPoints, size: size, lineWidth: lineWidth)
-      
-    let shapeLayer = createShapeLayer(path.cgPath, lineWidth: lineWidth,
-      fillColor: fillColor, strokeColor: strokeColor, size: size)
-      
-    containerLayer.addSublayer(shapeLayer)
+    static func create(_ starPoints: [CGPoint], size: Double,
+                       lineWidth: Double, fillColor: UIColor, strokeColor: UIColor) -> CALayer {
+        
+        let containerLayer = createContainerLayer(size)
+        let path = createStarPath(starPoints, size: size, lineWidth: lineWidth)
+        
+        let shapeLayer = createShapeLayer(path.cgPath, lineWidth: lineWidth,
+                                          fillColor: fillColor, strokeColor: strokeColor, size: size)
+        
+        containerLayer.addSublayer(shapeLayer)
+        
+        return containerLayer
+    }
     
-    return containerLayer
-  }
-
+    static func createNumeric(size: Double, font: UIFont, lineWidth: Double, fillColor: UIColor, strokeColor: UIColor, numberColor: UIColor, text: String) -> CALayer {
+        
+        let containerLayer = createContainerLayer(size)
+        
+        let shapeLayer = createCircleNumericShape(size: size, font: font, lineWidth: lineWidth, fillColor: fillColor, strokeColor: strokeColor, numberColor: numberColor, text: text)
+        
+        containerLayer.addSublayer(shapeLayer)
+        
+        return containerLayer
+    }
+    
   /**
 
   Creates the star layer from an image
@@ -87,6 +98,43 @@ struct StarLayer {
     layer.isOpaque = true
     return layer
   }
+    
+    static func createCircleNumericShape(size: Double, font: UIFont, lineWidth: Double, fillColor: UIColor, strokeColor: UIColor, numberColor: UIColor, text: String) -> CALayer {
+        
+        let halfSize:CGFloat = CGFloat(min( size/2, size/2))
+        let desiredLineWidth:CGFloat =  CGFloat(lineWidth)
+        let circlePath = UIBezierPath(
+            arcCenter: CGPoint(x:halfSize,y:halfSize),
+            radius: CGFloat(halfSize - (desiredLineWidth/2)),
+            startAngle: CGFloat(0),
+            endAngle:CGFloat(Double.pi * 2),
+            clockwise: true)
+        
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.path = circlePath.cgPath
+        shapeLayer.fillColor = fillColor.cgColor
+        shapeLayer.strokeColor = strokeColor.cgColor
+        shapeLayer.lineWidth = desiredLineWidth
+
+        let textlayer = CATextLayer()
+        textlayer.contentsScale = UIScreen.main.scale
+        textlayer.string = text
+        textlayer.font = font
+        textlayer.fontSize = font.pointSize
+        textlayer.backgroundColor = UIColor.clear.cgColor
+        textlayer.foregroundColor = numberColor.cgColor
+        textlayer.alignmentMode = .center
+        textlayer.bounds.size = CGSize(width: size, height: size)
+        textlayer.anchorPoint = CGPoint()
+        
+        let sizeOfCurrentFont: CGSize = text.size(withAttributes: [NSAttributedString.Key.font: font])
+        let yPos = CGFloat(size/2) - CGFloat(sizeOfCurrentFont.height/2)
+        textlayer.position = CGPoint(x: 0, y: yPos)
+
+        shapeLayer.addSublayer(textlayer)
+
+        return shapeLayer
+    }
   
   /**
   
@@ -141,7 +189,7 @@ struct StarLayer {
   
   Scale the star points by the given factor.
   
-  - parameter starPoints: Array of points for drawing a closed shape. The size of enclosing rectangle is 100 by 100.  
+  - parameter starPoints: Array of points for drawing a closed shape. The size of enclosing rectangle is 100 by 100.
   
   - parameter factor: The factor by which the star points are scaled. For example, if it is 0.5 the output points will define the shape twice as small as the original.
   

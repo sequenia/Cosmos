@@ -13,7 +13,8 @@ struct CosmosDefaultSettings {
   
   // MARK: - Star settings
   // -----------------------------
-
+  static let isEnumeratedView = false
+    
   /// Border color of an empty star.
   static let emptyBorderColor = defaultColor
   
@@ -31,6 +32,14 @@ struct CosmosDefaultSettings {
   
   /// Background color of a filled star.
   static let filledColor = defaultColor
+    
+  static let filledNumberColor = defaultColor
+    
+  static let emptyNumberColor = defaultColor
+    
+  // MARK: - Number settings
+  // -----------------------------
+  static let fontOfNumber: UIFont = UIFont.systemFont(ofSize: 14)
   
   /**
 

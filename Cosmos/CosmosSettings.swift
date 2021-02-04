@@ -17,6 +17,8 @@ public struct CosmosSettings {
   // MARK: - Star settings
   // -----------------------------
     
+  public var isEnumeratedView = CosmosDefaultSettings.isEnumeratedView
+    
   /// Border color of an empty star.
   public var emptyBorderColor = CosmosDefaultSettings.emptyBorderColor
   
@@ -34,6 +36,18 @@ public struct CosmosSettings {
   
   /// Background color of a filled star.
   public var filledColor = CosmosDefaultSettings.filledColor
+    
+  // MARK: - Number settings
+  // -----------------------------
+    
+  /// Color of a filled number.
+  public var filledNumberColor = CosmosDefaultSettings.filledNumberColor
+    
+  /// Color of a empty number.
+  public var emptyNumberColor = CosmosDefaultSettings.emptyNumberColor
+    
+  /// Font of a number.
+  public var fontOfNumber = CosmosDefaultSettings.fontOfNumber
   
   /**
   
